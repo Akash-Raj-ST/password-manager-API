@@ -1,0 +1,19 @@
+# Go binary and executable files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go test and coverage files
+*.test
+*.out
+*.cover
+*.prof
+
+# Dependency directories
+/vendor/
+/go.sum
+
+# Build output
+/bin/
