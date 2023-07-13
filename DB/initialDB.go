@@ -1,6 +1,7 @@
 package DB
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -27,12 +28,12 @@ func Connect() *gocql.Session{
 		log.Fatal(err)
 	}
 
-	keyspaceQuery := `
-		CREATE KEYSPACE IF NOT EXISTS password_api
+	keyspaceQuery := fmt.Sprintf(`
+		CREATE KEYSPACE IF NOT EXISTS %s
 		WITH REPLICATION = {
 			'class' : 'SimpleStrategy',
 			'replication_factor' : 1
-		};`
+		};`,os.Getenv("DB_KEYSPACE"))
 
 	err = session.Query(keyspaceQuery).Exec()
 
@@ -43,29 +44,63 @@ func Connect() *gocql.Session{
 	log.Println("Keyspace created successfully")
 
 	// Use the newly created keyspace
-	cluster.Keyspace = "password_api"
+	cluster.Keyspace = os.Getenv("DB_KEYSPACE")
+	log.Println("keyspace ",os.Getenv("DB_KEYSPACE"))
+
 	session, err = cluster.CreateSession()
 
 	if err != nil {
 		log.Println("Error connecting to mykeyspace:", err)
 	}
-	defer session.Close()
-
-	// Create a user table
-	tableQuery := `
-		CREATE TABLE IF NOT EXISTS users (
-			id UUID PRIMARY KEY,
-			name TEXT,
-			email TEXT
-		);`
-	err = session.Query(tableQuery).Exec()
-	if err != nil {
-		log.Println("Error creating user table:", err)
-	}
-
-	log.Println("User table created successfully")
-
-	log.Println("Session started executed successfully.")
+	
+	
+	createUserTable(session);
+	
+	log.Println("Session started successfully.")
 
 	return session;
 }
+
+type ItemUDT struct {
+	Key       string `cql:"key"`
+	Value     string `cql:"value"`
+	IsSecret  bool   `cql:"is_secret"`
+}
+
+func createUserTable(session *gocql.Session){
+	var tableQuery string;
+	var err error;
+
+	// Define the user-defined type (UDT)
+	err = session.Query(fmt.Sprintf(`
+		CREATE TYPE IF NOT EXISTS %s.itemudt (
+			key TEXT,
+			value TEXT,
+			is_secret BOOLEAN
+		)`,os.Getenv("DB_KEYSPACE"))).Exec();
+
+	if err != nil {
+		log.Fatal("Error creating user-defined type:", err)
+	}
+
+	log.Println("User-defined type created successfully")
+	
+	// Create a user table
+	tableQuery = `
+		CREATE TABLE IF NOT EXISTS auth (
+			userID UUID,
+			username TEXT,
+			password TEXT,
+			items List<FROZEN<itemUDT>>,
+			PRIMARY KEY ((userID,username))
+		);`
+
+	err = session.Query(tableQuery).Exec()
+
+	if err != nil {
+		log.Fatal("Error creating user table:", err)
+	}
+
+	log.Println("User table created successfully")
+}
+

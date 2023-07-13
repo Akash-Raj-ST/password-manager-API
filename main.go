@@ -11,6 +11,5 @@ func main(){
 	godotenv.Load(".env")
 	session := DB.Connect();
 
-	defer session.Close();
-	routes.StartAPI()
+	routes.StartAPI(session)
 }

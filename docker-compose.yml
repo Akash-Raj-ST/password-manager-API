@@ -3,25 +3,25 @@ version: "3"
 services:
   db:
     build: ./DB
-    expose:
+    ports:
       - 9042:9042
     volumes:
       - scylla_data:/var/lib/scylla
 
-  api:
-    build: .
-    expose:
-      - 8080
-    depends_on:
-      - db
+  # api:
+  #   build: .
+  #   expose:
+  #     - 8080
+  #   depends_on:
+  #     - db
 
-  nginx:
-    build: ./nginx
-    ports:
-      - 81:80
-    depends_on:
-      - db
-      - api
+  # nginx:
+  #   build: ./nginx
+  #   ports:
+  #     - 81:80
+  #   depends_on:
+  #     - db
+  #     - api
 
 volumes:
   scylla_data:
