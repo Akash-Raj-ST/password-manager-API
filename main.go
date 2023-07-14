@@ -22,6 +22,6 @@ func main(){
 	routes.SetRoutes(router,session);
 
 	// Start the server
-	log.Println("API server running in 8080")
+	log.Println("API server running in",os.Getenv("API_PORT"))
 	router.Run(fmt.Sprintf(":%s",os.Getenv("API_PORT")))
 }

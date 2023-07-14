@@ -37,7 +37,7 @@ func AuthHandler(c *gin.Context) {
 
 
 	//SQL injection
-	query := fmt.Sprintf("SELECT userID FROM auth WHERE username='%s' AND password='%s' ALLOW FILTERING",username,password);
+	query := fmt.Sprintf("SELECT userID FROM user WHERE username='%s' AND password='%s' ALLOW FILTERING",username,password);
 
 	log.Println(query);
 

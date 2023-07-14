@@ -61,11 +61,6 @@ func Connect() *gocql.Session{
 	return session;
 }
 
-type ItemUDT struct {
-	Key       string `cql:"key"`
-	Value     string `cql:"value"`
-	IsSecret  bool   `cql:"is_secret"`
-}
 
 func createUserTable(session *gocql.Session){
 	var tableQuery string;
@@ -73,7 +68,7 @@ func createUserTable(session *gocql.Session){
 
 	// Define the user-defined type (UDT)
 	err = session.Query(fmt.Sprintf(`
-		CREATE TYPE IF NOT EXISTS %s.itemudt (
+		CREATE TYPE IF NOT EXISTS %s.itemUDT (
 			key TEXT,
 			value TEXT,
 			is_secret BOOLEAN
@@ -84,15 +79,27 @@ func createUserTable(session *gocql.Session){
 	}
 
 	log.Println("User-defined type created successfully")
+
+	err = session.Query(fmt.Sprintf(`
+		CREATE TYPE IF NOT EXISTS %s.dataUDT (
+			username TEXT,
+			password TEXT,
+			items List<FROZEN<itemUDT>>
+		)`,os.Getenv("DB_KEYSPACE"))).Exec();
+
+	if err != nil {
+		log.Fatal("Error creating user-defined type:", err)
+	}
+
+	log.Println("User-defined type created successfully")
 	
 	// Create a user table
 	tableQuery = `
-		CREATE TABLE IF NOT EXISTS auth (
+		CREATE TABLE IF NOT EXISTS user(
 			userID UUID,
-			username TEXT,
+			username TEXT PRIMARY KEY,
 			password TEXT,
-			items List<FROZEN<itemUDT>>,
-			PRIMARY KEY ((userID,username))
+			data FROZEN<dataUDT>,
 		);`
 
 	err = session.Query(tableQuery).Exec()

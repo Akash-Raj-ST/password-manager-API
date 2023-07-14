@@ -14,7 +14,8 @@ func SetRoutes(router *gin.Engine,s *gocql.Session) {
 	router.Use(middleware.JWTMiddleware(s));
 	
 	// Define routes
-	router.GET("/auth", handlers.AuthHandler)
-	
+	router.POST("/auth", handlers.AuthHandler);
+	router.GET("/getData", handlers.GetData);
+	router.POST("/updateData", handlers.UpdateData)
 	
 }
