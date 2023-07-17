@@ -18,7 +18,7 @@ func SetRoutes(router *gin.Engine,s *gocql.Session) {
 	router.POST("/createData", handlers.CreateData)
 	router.GET("/getData", handlers.GetData);
 	router.GET("/getDataByID/:data_id",handlers.GetDataByID)
-	router.POST("/updateData/:data_id", handlers.UpdateData)
+	router.POST("/updateData", handlers.UpdateData)
 	router.POST("/deleteData/:data_id", handlers.DeleteData)
 	
 }

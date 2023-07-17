@@ -16,20 +16,23 @@ func UpdateData(c *gin.Context){
 	session := c.MustGet("session").(*gocql.Session) 
 	username := c.MustGet("username");
 
-	reqDataID := c.Param("data_id");
-	if reqDataID==""{
-		c.JSON(http.StatusBadRequest,gin.H{"status":"failed","message":"id required [/getData/:data_id]"})
-		return;
-	}
 	
 	var updateData models.Data;
 	
 	err := c.ShouldBindJSON(&updateData);
-	if err!=nil{
+	if err!=nil {
 		log.Println("Error while binding data",err.Error());
-		c.JSON(http.StatusBadRequest,gin.H{"status":"Data didn't match"})
+		c.JSON(http.StatusBadRequest,gin.H{"status":"Field didn't match"})
+		return;
+	}else if (updateData.DataID==gocql.UUID{}) {
+		log.Println("Error while binding data");
+		c.JSON(http.StatusBadRequest,gin.H{"status":"InValid Data id"})
 		return;
 	}
+
+	log.Println(updateData.DataID);
+	
+	reqDataID := updateData.DataID;
 
 	query := fmt.Sprintf("SELECT data FROM user WHERE username='%s' ALLOW FILTERING",username);
 
@@ -48,7 +51,7 @@ func UpdateData(c *gin.Context){
 
 	for _,data := range dataList{
 
-		if(data.DataID.String()==reqDataID){
+		if(data.DataID==reqDataID){
 			data_found = true;
 			data = updateData;
 		}
@@ -60,7 +63,7 @@ func UpdateData(c *gin.Context){
 		return;
 	}
 	
-	query = "UPDATE user SET data=? WHERE username=?";
+	query = "UPDATE user SET data=? WHERE username=? ALLOW FILTERING";
 
 	err = session.Query(query,updatedDataList,username).Exec();
 	if err!=nil{
