@@ -22,12 +22,14 @@ func GetData(c *gin.Context){
 	var data []models.Data;
 
 	err := resultSet.Scan(&data);
-
+	
 	if err!=nil{
-		log.Println("Error while retreiving data",err.Error());
+		log.Println("Error while binding data",err.Error());
 		c.JSON(http.StatusBadRequest,gin.H{"status":"GET data failed"})
 		return;
 	}
+
+	log.Println("id: ",data[0].DataID);
 
 	c.JSON(http.StatusAccepted,data);
 }

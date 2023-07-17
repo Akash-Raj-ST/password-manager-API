@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"api/api/models"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -24,16 +23,16 @@ func CreateData(c *gin.Context){
 		return;
 	}
 
-	query := fmt.Sprintf("SELECT data FROM user WHERE username='%s' ALLOW FILTERING",username);
+	query := "SELECT data FROM user WHERE username=?";
 
-	resultSet := session.Query(query);
+	resultSet := session.Query(query,username);
 
 	var allData []models.Data;
 
 	err = resultSet.Scan(&allData);
 
 	if err!=nil{
-		log.Println("Error while binding data",err.Error());
+		log.Println("Error while binding query data",err.Error());
 		c.JSON(http.StatusBadRequest,gin.H{"status":"failed"})
 		return;
 	}

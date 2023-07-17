@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gocql/gocql"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func AuthHandler(c *gin.Context) {
@@ -29,21 +30,11 @@ func AuthHandler(c *gin.Context) {
 	}
 
 	var username string = user.Username;
-	password,err  := utils.GenerateHash(user.Password);
-
-	if err!=nil {
-		log.Println(err);
-
-		c.JSON(http.StatusBadRequest,gin.H{"error":"password error"});
-		return;
-	}
-
-	log.Printf("User %s trying to login... with %s",username,password);
-
+	
 	//verify user
-
+	
 	query := "SELECT password FROM user WHERE username=?";
-
+	
 
 	resultSet := session.Query(query,username);
 
@@ -52,7 +43,7 @@ func AuthHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest,gin.H{"status":"Authentication Failed"});
 		return;
 	}
-
+	
 	var hashedPassword string;
 	err = resultSet.Scan(&hashedPassword);
 	if err!=nil{
@@ -61,8 +52,12 @@ func AuthHandler(c *gin.Context) {
 		return;
 	}
 
-	if hashedPassword!=password{
-		c.JSON(http.StatusBadRequest,gin.H{"status":"Authentication Failed"});
+	err  = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(user.Password));
+
+	if err!=nil {
+		log.Println(err);
+
+		c.JSON(http.StatusBadRequest,gin.H{"error":"Wrong Password"});
 		return;
 	}
 

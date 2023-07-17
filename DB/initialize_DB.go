@@ -9,8 +9,9 @@ import (
 	"github.com/gocql/gocql"
 )
 
-func Connect() *gocql.Session{
-	log.Println("Starting connection...");
+func InitializeDB(){
+	log.Println("Initializing DB...\nStarting connection...");
+	
 	cluster := gocql.NewCluster(os.Getenv("DB_PRIVATE_DOMAIN")) 
 	
 	cluster.ProtoVersion = 4
@@ -58,7 +59,7 @@ func Connect() *gocql.Session{
 	
 	log.Println("Session started successfully.")
 
-	return session;
+	defer session.Close();
 }
 
 

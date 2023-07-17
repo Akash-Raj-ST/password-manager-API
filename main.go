@@ -14,7 +14,17 @@ import (
 
 func main(){
 	godotenv.Load(".env")
-	session := DB.Connect();
+
+	if len(os.Args) >1 {
+        input := os.Args[1]
+		if(input=="initDB"){
+			DB.InitializeDB();
+		}else{
+			log.Fatal("No such command Available:['initDB']")
+		}
+    }
+
+	session := DB.ConnectDB();
 
 	defer session.Close();
 
