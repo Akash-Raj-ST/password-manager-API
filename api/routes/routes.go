@@ -1,21 +1,24 @@
 package routes
 
 import (
-	"log"
+	"api/handlers"
+	"api/middleware"
 
-	"api/api/handlers"
-
+	"github.com/gocql/gocql"
 	"github.com/gin-gonic/gin"
 )
 
-func StartAPI() {
-	// Create a new Gin router
-	router := gin.Default()
+func SetRoutes(router *gin.Engine,s *gocql.Session) {
 
+	router.Use(middleware.SessionMiddleware(s));
+	router.Use(middleware.JWTMiddleware(s));
+	
 	// Define routes
-	router.GET("/", handlers.AuthHandler)
-
-	// Start the server
-	log.Println("API server running in 8080")
-	router.Run(":8080")
+	router.POST("/auth", handlers.AuthHandler);
+	router.POST("/createData", handlers.CreateData)
+	router.GET("/getData", handlers.GetData);
+	router.GET("/getDataByID/:data_id",handlers.GetDataByID)
+	router.POST("/updateData", handlers.UpdateData)
+	router.POST("/deleteData/:data_id", handlers.DeleteData)
+	
 }
