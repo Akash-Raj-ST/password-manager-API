@@ -6,7 +6,7 @@ import (
 	
 
 type Data struct{
-	DataID    gocql.UUID   `cql:"dataID"   json:"dataID"`;
+	DataID    gocql.UUID   `cql:"dataid"   json:"dataid"`;
 	Username  string       `cql:"username" json:"username"`;
 	Password  string       `cql:"password" json:"password"`;
 	Email     string       `cql:"email"    json:"email"`;

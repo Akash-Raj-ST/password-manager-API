@@ -53,7 +53,8 @@ func UpdateData(c *gin.Context){
 
 		if(data.DataID==reqDataID){
 			data_found = true;
-			data = updateData;
+			updatedDataList = append(updatedDataList, updateData);
+			continue;
 		}
 		updatedDataList = append(updatedDataList, data);
 	}
@@ -63,7 +64,7 @@ func UpdateData(c *gin.Context){
 		return;
 	}
 	
-	query = "UPDATE user SET data=? WHERE username=? ALLOW FILTERING";
+	query = "UPDATE user SET data=? WHERE username=?;";
 
 	err = session.Query(query,updatedDataList,username).Exec();
 	if err!=nil{
@@ -72,5 +73,5 @@ func UpdateData(c *gin.Context){
 		return;
 	}
 
-	c.JSON(http.StatusAccepted,updatedDataList);
+	c.JSON(http.StatusAccepted,updateData);
 }
