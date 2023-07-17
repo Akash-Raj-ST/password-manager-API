@@ -82,8 +82,10 @@ func createUserTable(session *gocql.Session){
 
 	err = session.Query(fmt.Sprintf(`
 		CREATE TYPE IF NOT EXISTS %s.dataUDT (
+			dataID UUID,
 			username TEXT,
 			password TEXT,
+			email TEXT,
 			items List<FROZEN<itemUDT>>
 		)`,os.Getenv("DB_KEYSPACE"))).Exec();
 
@@ -99,7 +101,7 @@ func createUserTable(session *gocql.Session){
 			userID UUID,
 			username TEXT PRIMARY KEY,
 			password TEXT,
-			data FROZEN<dataUDT>,
+			data List<FROZEN<dataUDT>>,
 		);`
 
 	err = session.Query(tableQuery).Exec()

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -16,11 +15,11 @@ func GetData(c *gin.Context){
 	session := c.MustGet("session").(*gocql.Session) 
 	username := c.MustGet("username");
 
-	query := fmt.Sprintf("SELECT data FROM user WHERE username='%s' ALLOW FILTERING",username);
+	query := "SELECT data FROM user WHERE username=? ALLOW FILTERING";
 
-	resultSet := session.Query(query);
+	resultSet := session.Query(query,username);
 
-	var data models.Data;
+	var data []models.Data;
 
 	err := resultSet.Scan(&data);
 

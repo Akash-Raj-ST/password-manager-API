@@ -29,28 +29,39 @@ func AuthHandler(c *gin.Context) {
 	}
 
 	var username string = user.Username;
-	var password string = hashPassword(user.Password);
+	password,err  := utils.GenerateHash(user.Password);
+
+	if err!=nil {
+		log.Println(err);
+
+		c.JSON(http.StatusBadRequest,gin.H{"error":"password error"});
+		return;
+	}
 
 	log.Printf("User %s trying to login... with %s",username,password);
 
 	//verify user
 
+	query := "SELECT password FROM user WHERE username=?";
 
-	//SQL injection
-	query := fmt.Sprintf("SELECT userID FROM user WHERE username='%s' AND password='%s' ALLOW FILTERING",username,password);
 
-	log.Println(query);
+	resultSet := session.Query(query,username);
 
-	iter := session.Query(query).WithContext(c).Iter();
-
-	if iter.NumRows()==0 && !iter.Scan() {
+	if resultSet.Iter().NumRows()==0 {
 		log.Println("ResultSet Empty")
 		c.JSON(http.StatusBadRequest,gin.H{"status":"Authentication Failed"});
 		return;
+	}
 
-	}else if iter.NumRows()>1{
-		//alert admin
-		log.Println("ResultSet greater than 1")
+	var hashedPassword string;
+	err = resultSet.Scan(&hashedPassword);
+	if err!=nil{
+		log.Println("Error while binding data",err.Error());
+		c.JSON(http.StatusBadRequest,gin.H{"status":"failed"})
+		return;
+	}
+
+	if hashedPassword!=password{
 		c.JSON(http.StatusBadRequest,gin.H{"status":"Authentication Failed"});
 		return;
 	}
@@ -66,6 +77,3 @@ func AuthHandler(c *gin.Context) {
 }
 
 
-func hashPassword(password string) string{
-	return password;
-}
