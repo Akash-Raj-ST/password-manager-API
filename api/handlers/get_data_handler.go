@@ -29,7 +29,5 @@ func GetData(c *gin.Context){
 		return;
 	}
 
-	log.Println("id: ",data[0].DataID);
-
 	c.JSON(http.StatusAccepted,data);
 }
