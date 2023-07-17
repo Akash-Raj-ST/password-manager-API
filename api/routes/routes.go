@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"api/api/handlers"
-	"api/api/middleware"
+	"api/handlers"
+	"api/middleware"
 
 	"github.com/gocql/gocql"
 	"github.com/gin-gonic/gin"

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"api/api/models"
+	"api/models"
 
 	"log"
 	"net/http"

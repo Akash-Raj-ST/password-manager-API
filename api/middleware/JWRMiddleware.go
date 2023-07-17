@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"api/api/utils"
+	"api/utils"
 
 	"log"
 	"net/http"

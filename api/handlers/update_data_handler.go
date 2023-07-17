@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"api/api/models"
+	"api/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gocql/gocql"

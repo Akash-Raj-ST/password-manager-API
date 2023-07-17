@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"api/api/models"
-	"api/api/utils"
+	"api/models"
+	"api/utils"
 
 	"fmt"
 	"log"
