@@ -2,16 +2,16 @@ version: "3"
 
 services:
   db:
-    build: ./DB
-    expose:
+    image: scylladb/scylla:5.1
+    ports:
       - 9042:9042
     volumes:
       - scylla_data:/var/lib/scylla
 
   api:
-    build: .
+    build: ./api
     expose:
-      - 8080
+      - 8081
     depends_on:
       - db
 
